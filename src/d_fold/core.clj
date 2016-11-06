@@ -72,18 +72,13 @@
       (stop-fn)
       response)))
 
-(defn- loadable-namespace [namespace-str]
-  (str "/" (-> namespace-str
-               (clojure.string/replace #"\." "/")
-               (clojure.string/replace #"-" "_"))))
-
-(defn run-d-fold [f f-str xs function-namespace node-count lambda-function-name region]
+(defn run-d-fold [f serialized-f xs function-namespace node-count lambda-function-name region]
   (let [out (sqs/create-queue region (uuid))
         in (sqs/create-queue region (uuid))]
     (dotimes [_ node-count]
       (thread (invoke-lambda {:region region
-                              :function f-str
-                              :function-namespace (loadable-namespace function-namespace)
+                              :function serialized-f
+                              :function-namespace (str function-namespace)
                               :in in
                               :out out}
                              lambda-function-name region)))

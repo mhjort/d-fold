@@ -2,6 +2,7 @@
   (:require [uswitch.lambada.core :refer [deflambdafn]]
             [clojure.core.async :refer [chan thread go go-loop >! <! <!!]]
             [clojure.java.io :as io]
+            [clojure.string :as string]
             [d-fold.sqs :as sqs]
             [cheshire.core :refer [generate-stream parse-stream]]))
 
@@ -17,18 +18,25 @@
         (when-not (some #(= "stop" %) responses)
           (recur))))))
 
-(deflambdafn d-fold.LambdaFn
-  [in out ctx]
+(defn- load-ns [ns-str]
+  (let [ns-path (str "/" (-> ns-str
+                             (string/replace #"\." "/")
+                             (string/replace #"-" "_")))]
+    (println "Loading ns" ns-path)
+    (load ns-path)))
+
+(deflambdafn d-fold.LambdaFn [in out ctx]
   (load "/serializable/fn")
   (load "/clojure/core/reducers")
   (let [input (parse-stream (io/reader in) true)
         output (io/writer out)]
-    (println "Running with function:" (:function input))
-    (load (:function-namespace input))
-    (message-loop (:region input)
-                  (load-string (:function input))
-                  (:in input)
-                  (:out input))
+    (println "Running with function" (:function input) "from namespace" (:function-namespace input))
+    (load-ns (:function-namespace input))
+    (binding [*ns* (create-ns (symbol (:function-namespace input)))]
+      (message-loop (:region input)
+                    (load-string (:function input))
+                    (:in input)
+                    (:out input)))
     (println "Run successfully")
-    (generate-stream {:success true} output)
+    (generate-stream {:success? true} output)
     (.flush output)))
