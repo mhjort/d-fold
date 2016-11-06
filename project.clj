@@ -10,5 +10,6 @@
                  [com.amazonaws/aws-java-sdk-lambda "1.10.50"]
                  [com.amazonaws/aws-java-sdk-sqs "1.10.50"]
                  [com.amazonaws/aws-java-sdk-core "1.10.50"]
-                 [uswitch/lambada "0.1.2"]])
+                 [uswitch/lambada "0.1.2"]]
+  :aot :all)
 
