@@ -1,6 +1,6 @@
-(defproject d-fold "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject d-fold "0.1.0"
+  :description "AWS Lambda powered distributed fold"
+  :url "https://github.com/mhjort/d-fold"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
